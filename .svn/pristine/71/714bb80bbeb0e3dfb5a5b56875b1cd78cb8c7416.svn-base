@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.ExceptionBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            scope = "0"
+            stopOnStyle = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "shoumila/Home(&#x9996;&#x9875;)/View/RYGDynamicContentView.m"
+            timestampString = "484415028.220571"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "334"
+            endingLineNumber = "334"
+            landmarkName = "-setDynamicFrame:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "shoumila/RankingList(&#x6392;&#x884c;&#x699c;)/View/RYGGrandeMarkView.m"
+            timestampString = "484148151.524063"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "-setupGrandeMarkView"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "shoumila/Home(&#x9996;&#x9875;)/Controller/RYGPublishViewController.m"
+            timestampString = "484360043.026957"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "531"
+            endingLineNumber = "531"
+            landmarkName = "-textView:shouldChangeTextInRange:replacementText:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "shoumila/Home(&#x9996;&#x9875;)/Controller/RYGPublishViewController.m"
+            timestampString = "484360748.242111"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "836"
+            endingLineNumber = "836"
+            landmarkName = "-disFaceKeyboard"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[RYGPublishViewController disFaceKeyboard]"
+                  moduleName = "shoumila"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jialei/Desktop/shoumila/shoumila/Home(%E9%A6%96%E9%A1%B5)/Controller/RYGPublishViewController.m"
+                  timestampString = "484415225.486477"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "836"
+                  endingLineNumber = "836"
+                  offsetFromSymbolStart = "96">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__43-[RYGPublishViewController disFaceKeyboard]_block_invoke"
+                  moduleName = "shoumila"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jialei/Desktop/shoumila/shoumila/Home(%E9%A6%96%E9%A1%B5)/Controller/RYGPublishViewController.m"
+                  timestampString = "484415225.486721"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "837"
+                  endingLineNumber = "837"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "shoumila/Home(&#x9996;&#x9875;)/Controller/RYGPublishViewController.m"
+            timestampString = "484360748.242111"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "845"
+            endingLineNumber = "845"
+            landmarkName = "-disFaceKeyboard"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[RYGPublishViewController disFaceKeyboard]"
+                  moduleName = "shoumila"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jialei/Desktop/shoumila/shoumila/Home(%E9%A6%96%E9%A1%B5)/Controller/RYGPublishViewController.m"
+                  timestampString = "484415225.488189"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "845"
+                  endingLineNumber = "845"
+                  offsetFromSymbolStart = "376">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__43-[RYGPublishViewController disFaceKeyboard]_block_invoke.687"
+                  moduleName = "shoumila"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jialei/Desktop/shoumila/shoumila/Home(%E9%A6%96%E9%A1%B5)/Controller/RYGPublishViewController.m"
+                  timestampString = "484415225.488414"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "846"
+                  endingLineNumber = "846"
+                  offsetFromSymbolStart = "28">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

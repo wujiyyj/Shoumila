@@ -1,0 +1,398 @@
+//
+//  RYGSourceTableViewCell.m
+//  shoumila
+//
+//  Created by 贾磊 on 15/8/29.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGSourceTableViewCell.h"
+#import "RYGPublishViewController.h"
+#import "RYGNavigationController.h"
+
+#define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) 
+#define SCREEN_MAX_LENGTH (MAX(SCREEN_WIDTH, SCREEN_HEIGHT))
+#define IS_IPHONE_6P (IS_IPHONE && SCREEN_MAX_LENGTH == 736.0)
+
+static float FontSize;
+@interface RYGSourceTableViewCell ()
+
+@end
+
+@implementation RYGSourceTableViewCell
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        FontSize = IS_IPHONE_6P?13:11;
+        UIView *line1 = [[UIView alloc]initWithFrame:CGRectMake(45*SCREEN_SCALE, 10, 1, 68)];
+        line1.backgroundColor = ColorLine;
+        [self addSubview:line1];
+        UIView *line2 = [[UIView alloc]initWithFrame:CGRectMake(0, 1, SCREEN_WIDTH, 1)];
+        line2.backgroundColor = ColorLine;
+        [self addSubview:line2];
+        
+        _l1 = [[UILabel alloc]initWithFrame:CGRectMake(0, 8, 45, 24)];
+        _l1.font = [UIFont systemFontOfSize:FontSize];
+        _l1.textColor = ColorRankMenuBackground;
+        [self addSubview:_l1];
+        
+        _l2 = [[UILabel alloc]initWithFrame:CGRectMake(0, 32, 45, 24)];
+        _l2.font = [UIFont systemFontOfSize:FontSize];
+        _l2.textColor = ColorSecondTitle;
+        [self addSubview:_l2];
+        
+        _l3 = [[UILabel alloc]initWithFrame:CGRectMake(0, 55, 45, 24)];
+        
+        _l3.font = [UIFont systemFontOfSize:FontSize];
+        _l3.textColor = ColorSecondTitle;
+//        [_l3 sizeToFit];
+        [self addSubview:_l3];
+        
+        _ht = [[UILabel alloc]initWithFrame:CGRectMake(58*SCREEN_SCALE, 8, 75*SCREEN_SCALE, 24)];
+        _ht.font = [UIFont systemFontOfSize:FontSize];
+        _ht.textColor = ColorName;
+        [self addSubview:_ht];
+        
+        _vt = [[UILabel alloc]initWithFrame:CGRectMake(58*SCREEN_SCALE, 32, 75*SCREEN_SCALE, 24)];
+        
+        _vt.font = [UIFont systemFontOfSize:FontSize];
+        _vt.textColor = ColorName;
+//        [_vt sizeToFit];
+        [self addSubview:_vt];
+        
+        UILabel *he = [[UILabel alloc]initWithFrame:CGRectMake(58*SCREEN_SCALE, 55, 30, 24)];
+        he.text = @"和局";
+        he.font = [UIFont systemFontOfSize:FontSize];
+        he.textColor = ColorName;
+        [self addSubview:he];
+        
+        _hvo = [[UIButton alloc]initWithFrame:CGRectMake(135*SCREEN_SCALE, 8, 42, 24)];
+        _hvo.font = [UIFont systemFontOfSize:FontSize];
+        [_hvo setTitleColor:ColorName forState:UIControlStateNormal];
+        [_hvo setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_hvo setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_hvo setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_hvo setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+//        [_hvo sizeToFit];
+        [self addSubview:_hvo];
+        
+        _vvo = [[UIButton alloc]initWithFrame:CGRectMake(135*SCREEN_SCALE, 32, 42, 24)];
+        _vvo.font = [UIFont systemFontOfSize:FontSize];
+        [_vvo setTitleColor:ColorName forState:UIControlStateNormal];
+        [_vvo setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_vvo setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_vvo setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_vvo setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+//        [_vvo sizeToFit];
+        [self addSubview:_vvo];
+        
+        _dro = [[UIButton alloc]initWithFrame:CGRectMake(135*SCREEN_SCALE, 55, 42, 24)];
+        _dro.font = [UIFont systemFontOfSize:FontSize];
+        [_dro setTitleColor:ColorName forState:UIControlStateNormal];
+        [_dro setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_dro setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_dro setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_dro setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+        [self addSubview:_dro];
+        
+        _hr = [[UIButton alloc]initWithFrame:CGRectMake(185*SCREEN_SCALE, 8, 42, 24)];
+        _hr.font = [UIFont systemFontOfSize:FontSize];
+        [_hr setTitleColor:ColorRankMedal forState:UIControlStateNormal];
+        [self addSubview:_hr];
+        
+        _vr = [[UIButton alloc]initWithFrame:CGRectMake(185*SCREEN_SCALE, 32, 40, 24)];
+        _vr.font = [UIFont systemFontOfSize:FontSize];
+        [_vr setTitleColor:ColorRankMedal forState:UIControlStateNormal];
+        [self addSubview:_vr];
+        
+        _hro = [[UIButton alloc]initWithFrame:CGRectMake(220*SCREEN_SCALE, 8, 30, 24)];
+        _hro.font = [UIFont systemFontOfSize:FontSize];
+        [_hro setTitleColor:ColorName forState:UIControlStateNormal];
+        [_hro setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_hro setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_hro setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_hro setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+        [self addSubview:_hro];
+        
+        _vro = [[UIButton alloc]initWithFrame:CGRectMake(220*SCREEN_SCALE, 32, 30, 24)];
+        _vro.font = [UIFont systemFontOfSize:FontSize];
+        [_vro setTitleColor:ColorName forState:UIControlStateNormal];
+        [_vro setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_vro setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_vro setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_vro setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+        //        [_dro sizeToFit];
+        [self addSubview:_vro];
+        _dx = [[UIButton alloc]initWithFrame:CGRectMake(250*SCREEN_SCALE, 8, 40, 24)];
+        _dx.font = [UIFont systemFontOfSize:FontSize];
+        [_dx setTitleColor:ColorRankMedal forState:UIControlStateNormal];
+        [self addSubview:_dx];
+        
+        _dxh = [[UIButton alloc]initWithFrame:CGRectMake(285*SCREEN_SCALE, 8, 30, 24)];
+        
+        _dxh.font = [UIFont systemFontOfSize:FontSize];
+        [_dxh setTitleColor:ColorName forState:UIControlStateNormal];
+        [_dxh setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_dxh setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_dxh setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_dxh setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+        //        [_dro sizeToFit];
+        [self addSubview:_dxh];
+        
+        _dxv = [[UIButton alloc]initWithFrame:CGRectMake(285*SCREEN_SCALE, 32, 30, 24)];
+        
+        _dxv.font = [UIFont systemFontOfSize:FontSize];
+        [_dxv setTitleColor:ColorName forState:UIControlStateNormal];
+        [_dxv setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+        [_dxv setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateSelected];
+        [_dxv setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+        [_dxv setBackgroundImage:[UIImage imageNamed:@"blue"] forState:UIControlStateHighlighted];
+        //        [_dro sizeToFit];
+        [self addSubview:_dxv];
+
+    }
+    return self;
+}
+
+-(void)setData:(RYGScoreGQEntity *)data{
+    _data = data;
+    NSString *l1text;
+    NSString *l2text;
+    NSString *l3text;
+    if (data.hs&&data.vs) {
+        l1text = [NSString stringWithFormat:@"%@-%@",data.hs,data.vs];
+        l2text = [NSString stringWithFormat:@"%@",data.hc];
+        l3text = [NSString stringWithFormat:@"%@",data.t];
+    }else{
+        l1text = [NSString stringWithFormat:@"LIVE!"];
+        l2text = [NSString stringWithFormat:@"%@",data.date];
+        l3text = [NSString stringWithFormat:@"%@",data.stime];
+    }
+    if ([data.hc isEqualToString:@"MT"]) {
+        l2text = @"";
+        l3text = @"";
+    }
+    _l1.text = l1text;
+    _l2.text = l2text;
+    _l3.text = l3text;
+    _l1.textAlignment = NSTextAlignmentCenter;
+    _l2.textAlignment = NSTextAlignmentCenter;
+    _l3.textAlignment = NSTextAlignmentCenter;
+    UITapGestureRecognizer *regconizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_hvo setTitle:data.hvo forState:UIControlStateNormal];
+    _hvo.tag = 100;
+    if (![_data.hvo isEqualToString:@""]&&_data.hvo){
+        [_hvo addGestureRecognizer:regconizer];
+        _hvo.userInteractionEnabled = YES;
+    }else{
+        _hvo.userInteractionEnabled = NO;
+    }
+
+    [_vvo setTitle:data.vvo forState:UIControlStateNormal];
+    _vvo.tag = 101;
+    if (![_data.vvo isEqualToString:@""]&&_data.vvo){
+        _vvo.userInteractionEnabled = YES;
+        UITapGestureRecognizer *regconizer101 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+        [_vvo addGestureRecognizer:regconizer101];
+    }else{
+        _vvo.userInteractionEnabled = NO;
+    }
+    _ht.text = data.ht;
+    _vt.text = data.vt;
+    [_dro setTitle:data.dro forState:UIControlStateNormal];
+    _dro.tag = 102;
+    if (![_data.dro isEqualToString:@""]&&_data.dro){
+        _dro.userInteractionEnabled = YES;
+        UITapGestureRecognizer *regconizer102 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+        [_dro addGestureRecognizer:regconizer102];
+    }else{
+        _dro.userInteractionEnabled = NO;
+    }
+    [_hr setTitle:data.hr forState:UIControlStateNormal];
+    [_vr setTitle:data.vr forState:UIControlStateNormal];
+    [_hro setTitle:data.hro forState:UIControlStateNormal];
+    _hro.tag = 103;
+    if (![_data.hro isEqualToString:@""]&&_data.hro){
+        _hro.userInteractionEnabled = YES;
+        UITapGestureRecognizer *regconizer103 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+        [_hro addGestureRecognizer:regconizer103];
+    }else{
+        _hro.userInteractionEnabled = NO;
+    }
+    [_vro setTitle:data.vro forState:UIControlStateNormal];
+    _vro.tag = 104;
+    if (![_data.vro isEqualToString:@""]&&_data.vro){
+        _vro.userInteractionEnabled = YES;
+        UITapGestureRecognizer *regconizer104 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+        [_vro addGestureRecognizer:regconizer104];
+    }else{
+        _vro.userInteractionEnabled = NO;
+    }
+    [_dx setTitle:data.dx forState:UIControlStateNormal];
+    [_dxh setTitle:data.dxh forState:UIControlStateNormal];
+    _dxh.tag = 105;
+    if (![_data.dxh isEqualToString:@""]&&_data.dxh){
+        _dxh.userInteractionEnabled = YES;
+        UITapGestureRecognizer *regconizer105 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+        [_dxh addGestureRecognizer:regconizer105];
+    }else{
+        _dxh.userInteractionEnabled = NO;
+    }
+    [_dxv setTitle:data.dxv forState:UIControlStateNormal];
+    _dxv.tag = 106;
+    if (![_data.dxv isEqualToString:@""]&&_data.dxv){
+        _dxv.userInteractionEnabled = YES;
+        UITapGestureRecognizer *regconizer106 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+        [_dxv addGestureRecognizer:regconizer106];
+    }else{
+        _dxv.userInteractionEnabled = NO;
+    }
+    [self changeColor];
+}
+
+- (void)changeColor{
+    RYGColorChange  *change = _data.change;
+    if (change.hvo) {
+        [_hvo setTitleColor:[UIColor colorWithHexadecimal:change.hvo] forState:UIControlStateNormal];
+    }
+    if (change.vvo) {
+        [_vvo setTitleColor:[UIColor colorWithHexadecimal:change.vvo] forState:UIControlStateNormal];
+    }
+    if (change.dro) {
+        [_dro setTitleColor:[UIColor colorWithHexadecimal:change.dro] forState:UIControlStateNormal];
+    }
+    if (change.hr) {
+        [_hr setTitleColor:[UIColor colorWithHexadecimal:change.hr] forState:UIControlStateNormal];
+    }
+    if (change.vr) {
+        [_vr setTitleColor:[UIColor colorWithHexadecimal:change.vr] forState:UIControlStateNormal];
+    }
+    if (change.hro) {
+        [_hro setTitleColor:[UIColor colorWithHexadecimal:change.hro] forState:UIControlStateNormal];
+    }
+    if (change.vro) {
+        [_vro setTitleColor:[UIColor colorWithHexadecimal:change.vro] forState:UIControlStateNormal];
+    }
+    if (change.dx) {
+        [_dx setTitleColor:[UIColor colorWithHexadecimal:change.dx] forState:UIControlStateNormal];
+    }
+    if (change.dxh) {
+        [_dxh setTitleColor:[UIColor colorWithHexadecimal:change.dxh] forState:UIControlStateNormal];
+    }
+    if (change.dxv) {
+        [_dxv setTitleColor:[UIColor colorWithHexadecimal:change.dxv] forState:UIControlStateNormal];
+    }
+
+}
+
+-(void)selectLabel1:(UITapGestureRecognizer *)regconizer{
+    NSLog(@"111");
+}
+-(void)selectLabel:(UITapGestureRecognizer *)regconizer{
+
+    RYGScoreParam *param = [[RYGScoreParam alloc]init];
+    param.matchid = _data.mid;
+    param.ht = _data.ht;
+    param.vt = _data.vt;
+    param.dx = _data.dx;
+    param.date = _data.date;
+    param.stime = _data.stime;
+    param.hc = _data.hc;
+    param.t = _data.t;
+    if (_data.hs) {
+        param.type = @"2";
+        param.hs = _data.hs;
+        param.vs = _data.vs;
+    }else{
+        param.type = @"1";
+    }
+    switch (regconizer.view.tag) {
+        case 100:
+            param.rules = @"1";
+            param.rulesName = @"胜负平";
+            param.forecasts = @"1";
+            param.odds = _data.hvo;
+            break;
+        case 101:
+            param.rules = @"1";
+            param.rulesName = @"胜负平";
+            param.forecasts = @"2";
+            param.odds = _data.vvo;
+            break;
+        case 102:
+            param.rules = @"1";
+            param.rulesName = @"胜负平";
+            param.forecasts = @"3";
+            param.odds = _data.dro;
+            break;
+        case 103:
+        {
+            param.rules = @"2";
+            param.rulesName = @"让球";
+            param.forecasts = @"1";
+            NSString *hr = [NSString stringWithFormat:@"-%@",_data.hr];
+            NSString *vr = [NSString stringWithFormat:@"+%@",_data.vr];
+            NSString *handicap = _data.hr.length?hr:vr;
+            param.handicap = handicap;
+            param.odds = _data.hro;
+            break;
+        }
+        case 104:
+        {
+            param.rules = @"2";
+            param.rulesName = @"让球";
+            param.forecasts = @"2";
+            NSString *hr = [NSString stringWithFormat:@"+%@",_data.hr];
+            NSString *vr = [NSString stringWithFormat:@"-%@",_data.vr];
+            NSString *handicap = _data.hr.length?hr:vr;
+            param.handicap = handicap;
+            param.odds = _data.vro;
+            break;
+        }
+        case 105:
+            param.rules = @"3";
+            param.rulesName = @"大小";
+            param.rulesHigh = @"大";
+            param.forecasts = @"1";
+            param.handicap = _data.dx;
+            param.odds = _data.dxh;
+            break;
+        case 106:
+            param.rules = @"3";
+            param.rulesName = @"大小";
+            param.rulesHigh = @"小";
+            param.forecasts = @"2";
+            param.handicap = _data.dx;
+            param.odds = _data.dxv;
+            break;
+            
+        default:
+            break;
+    }
+   
+    UIButton *view =  (UIButton *)regconizer.view;
+    view.selected = YES;
+    [UIView animateWithDuration:0.3 animations:^{
+        view.alpha = 0.3;
+    } completion:^(BOOL finished) {
+        view.selected = NO;
+        view.alpha = 1;
+        if (_selectScoreBlock) {
+            _selectScoreBlock(param);
+            [[NSNotificationCenter defaultCenter]postNotificationName:kPublishVCCancelNotification object:nil];
+        }else if([RYGUtility getUserInfo]){
+            RYGPublishViewController *publishController = [[RYGPublishViewController alloc]init];
+            publishController.scoreParam = param;
+            RYGNavigationController *nav = [[RYGNavigationController alloc]initWithRootViewController:publishController];
+            [[RYGUtility getCurrentVC]presentViewController:nav animated:YES completion:^{
+                [publishController scoreCallBack];
+            }];
+        }
+
+    }];
+    
+}
+
+@end

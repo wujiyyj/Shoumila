@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "+[RYGUtility getCurrentVC]:RYGUtility.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "window.subviews">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGSearchViewController collectionView:numberOfItemsInSection:]:RYGSearchViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGCommentView tableView:numberOfRowsInSection:]:RYGCommentView.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "_commentFrame.commentModel.thread">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "__35-[RYGDynamicFrame setDynamicModel:]_block_invoke:RYGDynamicFrame.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "comments">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGDynamicGroupTableViewCell setDynamicFrame:]:RYGDynamicGroupTableViewCell.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.dynamicFrame.dynamicModel.pics">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGDynamicDetailViewController tableView:didSelectRowAtIndexPath:]:RYGDynamicDetailViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGFeedThreadsViewController textView:shouldChangeTextInRange:replacementText:]:RYGFeedThreadsViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGHomeDynamicViewController touchesBegan:withEvent:]:RYGHomeDynamicViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGDynamicDetailViewController tableView:cellForRowAtIndexPath:]:RYGDynamicDetailViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "__37-[RYGPublishViewController betAction]_block_invoke:RYGPublishViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "__40-[RYGFeedThreadsViewController loadData]_block_invoke:RYGFeedThreadsViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGScoreTableViewCell tableView:didSelectRowAtIndexPath:]:RYGScoreTableViewCell.m">
+      </ContextState>
+      <ContextState
+         contextName = "__36-[RYGPublishViewController atAction]_block_invoke:RYGPublishViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGSearchViewController removeSubViews:]:RYGSearchViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGSearchViewController collectionView:cellForItemAtIndexPath:]:RYGSearchViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "cell.subviews">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "__40-[RYGHomeDynamicViewController loadData]_block_invoke:RYGHomeDynamicViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.tabBarController">
+            </PersistentString>
+            <PersistentString
+               value = "dynamicList">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RYGSourceTableViewCell setData:]:RYGSourceTableViewCell.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "_data.vvo">
+            </PersistentString>
+            <PersistentString
+               value = "![_data.hvo isEqualToString:@&quot; &quot;]">
+            </PersistentString>
+            <PersistentString
+               value = "_data.hvo">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

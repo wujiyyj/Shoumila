@@ -1,0 +1,29 @@
+//
+//  RYGMyDataTableViewCell.h
+//  shoumila
+//
+//  Created by yinyujie on 15/7/31.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "RYGMenuItemView.h"
+#import "RYGScrollPageView.h"
+#import "RYGPersonalDatasModel.h"
+#import "RYGPersonalUserModel.h"
+
+@interface RYGMyDataTableViewCell : UITableViewCell<UIScrollViewDelegate>
+
+@property(nonatomic,copy) void(^dataBlock)();
+@property(nonatomic,copy) void(^timeBlock)();
+@property(nonatomic,copy) void(^tapWinLoseBlock)();
+
+@property (nonatomic, strong)UIScrollView *scrollView;
+@property (nonatomic, strong)UIPageControl *pageControl;
+
+@property (nonatomic, strong)RYGPersonalUserModel  *userDataModel;
+@property (nonatomic, strong)RYGPersonalDatasModel *weekDataModel;
+@property (nonatomic, strong)RYGPersonalDatasModel *monthDataModel;
+@property (nonatomic, strong)RYGPersonalDatasModel *ninetyDataModel;
+
+@end

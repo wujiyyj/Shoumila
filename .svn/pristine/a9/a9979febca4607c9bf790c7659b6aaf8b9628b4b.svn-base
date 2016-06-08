@@ -1,0 +1,249 @@
+//
+//  RYGQuickLoginViewController.m
+//  shoumila
+//
+//  Created by yinyujie on 15/8/10.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGQuickLoginViewController.h"
+#import "RYGBindTeleViewController.h"
+#import "RYGUserLoginParam.h"
+#import "RYGHttpRequest.h"
+#import "RYGUserInfoModel.h"
+#import "RYGSingleton.h"
+#import <ShareSDK/ShareSDK.h>
+//#import "WeiboUser.h"
+//#import "WeiboSDK.h"
+
+@interface RYGQuickLoginViewController ()
+
+@property(nonatomic,strong) RYGUserInfoModel *userInfoModel;
+
+@end
+
+@implementation RYGQuickLoginViewController
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    self.navigationItem.title = @"快速登录";
+    self.view.backgroundColor = ColorRankMyRankBackground;
+    
+    [self performSelectorOnMainThread:@selector(login)withObject:nil waitUntilDone:NO];
+    
+    [self createMainView];
+}
+
+-(void)login
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(weiBoDidLogin:) name:@"weiBoDidLogin" object:nil];
+}
+
+-(void)createMainView
+{
+    UIView* backView = [[UIView alloc]initWithFrame:CGRectMake(0, 10, SCREEN_WIDTH, 190)];
+    backView.backgroundColor = ColorRankBackground;
+    [self.view addSubview:backView];
+    
+    UIView* top_lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 0.5)];
+    top_lineView.backgroundColor = ColorLine;
+    [backView addSubview:top_lineView];
+    
+    UIView* bottom_lineView = [[UIView alloc]initWithFrame:CGRectMake(0, backView.frame.size.height-0.5, SCREEN_WIDTH, 0.5)];
+    bottom_lineView.backgroundColor = ColorLine;
+    [backView addSubview:bottom_lineView];
+    
+    UIImageView* picImage = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/2-25, 80, 50, 50)];
+    picImage.image = [UIImage imageNamed:@"sdk_weibo_logo"];
+    [backView addSubview:picImage];
+    
+    UILabel* weiBoLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/2-30, 135, 60, 20)];
+    weiBoLabel.text = @"新浪微博";
+    weiBoLabel.textColor = ColorRankMedal;
+    weiBoLabel.font = [UIFont systemFontOfSize:14];
+    weiBoLabel.textAlignment = NSTextAlignmentCenter;
+    [backView addSubview:weiBoLabel];
+    
+    UIButton* authorBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+    authorBtn.frame = CGRectMake((SCREEN_WIDTH-290*SCREEN_SCALE)/2, 220, 290*SCREEN_SCALE, 40);
+    authorBtn.layer.cornerRadius = 5;
+    [authorBtn setBackgroundColor:ColorTabBarButtonTitleSelected];
+    [authorBtn setTitle:@"确认授权" forState:UIControlStateNormal];
+    [authorBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    authorBtn.titleLabel.font = [UIFont systemFontOfSize:18];
+    [authorBtn addTarget:self action:@selector(goAuthor) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:authorBtn];
+}
+
+-(void)goAuthor
+{
+    [self loginWithSinaWeibo];
+    
+}
+
+#pragma mark -- LoginwithSinaWeibo Methods
+-(void)loginWithSinaWeibo
+{
+    [ShareSDK getUserInfoWithType:ShareTypeSinaWeibo authOptions:nil result:^(BOOL result, id<ISSPlatformUser> userInfo, id<ICMErrorInfo> error) {
+        NSLog(@"%d",result);
+        if (result) {
+            //成功登录后，判断该用户的ID是否在自己的数据库中。
+            //如果有直接登录，没有就将该用户的ID和相关资料在数据库中创建新用户。
+//            [self reloadStateWithType:ShareTypeSinaWeibo];
+            [self NewSinaWeiboUserInfo];
+        }
+    }];
+//    WBAuthorizeRequest* request = [WBAuthorizeRequest request];
+//    request.redirectURI = kAppRedirectURL;
+//    request.scope = @"all";
+//    request.userInfo = @{@"SSO_From":@"QDQuickLoginController",
+//                         @"Other_Info_1":[NSNumber numberWithInt:123],
+//                         @"Other_Info_1":@[@"obj1",@"obj2"],
+//                         @"Other_Info_1":@{@"key1":@"obj1",@"key2":@"obj2"}};
+//    [WeiboSDK sendRequest:request];
+    
+}
+
+//-(void)reloadStateWithType:(ShareType)type{
+//    //现实授权信息，包括授权ID、授权有效期等。
+//    //此处可以在用户进入应用的时候直接调用，如授权信息不为空且不过期可帮用户自动实现登录。
+//    id<ISSPlatformCredential> credential = [ShareSDK getCredentialWithType:type];
+//    
+//    [self NewSinaWeiboUserInfo];
+//    
+//    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"TEXT_TIPS", @"提示")
+//                                                        message:[NSString stringWithFormat:
+//                                                                 @"uid = %@\ntoken = %@\nsecret = %@\n expired = %@\nextInfo = %@",
+//                                                                 [credential uid],
+//                                                                 [credential token],
+//                                                                 [credential secret],
+//                                                                 [credential expired],
+//                                                                 [credential extInfo]]
+//                                                       delegate:nil
+//                                              cancelButtonTitle:NSLocalizedString(@"TEXT_KNOW", @"知道了")
+//                                              otherButtonTitles:nil];
+//    [alertView show];
+//}
+//
+//-(void)weiBoDidLogin:(NSNotification *)notification{
+//    [self NewSinaWeiboUserInfo];
+//}
+
+-(void)NewSinaWeiboUserInfo{
+//    AppDelegate* myDelegate = (AppDelegate*)[[UIApplication sharedApplication]delegate];
+//    [WBHttpRequest requestForUserProfile:myDelegate.wbCurrentUserID withAccessToken:myDelegate.wbtoken andOtherProperties:nil queue:nil withCompletionHandler:^(WBHttpRequest *httpRequest, id result, NSError *error) {
+//        AppDelegate *myDelegate = (AppDelegate*)[[UIApplication sharedApplication]delegate];
+    
+    id<ISSPlatformCredential> credential = [ShareSDK getCredentialWithType:ShareTypeSinaWeibo];
+    
+    RYGUserLoginParam *loginParam = [RYGUserLoginParam param];
+    loginParam.type = @"2";
+    loginParam.third_uid = [credential uid];
+    loginParam.third_token = [credential token];
+    loginParam.device = @"ios";
+    loginParam.client_id = DeviceUUID;
+    [RYGHttpRequest postWithURL:User_Login params:loginParam.keyValues success:^(id json) {
+        
+        NSMutableDictionary *dic = [json valueForKey:@"data"];
+        
+        if ([[json valueForKey:@"code"] intValue] == 211) {
+            RYGBindTeleViewController* bindTeleController = [[RYGBindTeleViewController alloc]init];
+//                bindTeleController.third_Uid = myDelegate.wbCurrentUserID;
+//                bindTeleController.third_Token = myDelegate.wbtoken;
+//
+//                WeiboUser *user=(WeiboUser *)result;
+//                NSString *nikename = user.screenName;
+//                bindTeleController.third_Name = nikename;
+            [self.navigationController pushViewController:bindTeleController animated:YES];
+            return;
+        }
+        
+        _userInfoModel = [RYGUserInfoModel objectWithKeyValues:dic];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:UserInfo];
+        
+        NSString *path = [DOC_PATH stringByAppendingPathComponent:@"userInfo.data"];
+        [NSKeyedArchiver archiveRootObject:_userInfoModel toFile:path];
+        
+        [RYGSingleton sharedSingleton].userInfo = _userInfoModel;
+        //        [RYGSingleton sharedSingleton].userInfo = [[NSUserDefaults standardUserDefaults] objectForKey:UserInfo];
+//            NSLog(@"%@",[RYGSingleton sharedSingleton].userInfo);
+        
+    } failure:^(NSError *error) {
+        
+    }];
+//        QDHttpRequest *request = [[QDHttpRequest alloc]init];
+//        [request addParametersValue:[NSNumber numberWithInteger:2] forKey:@"type"];
+//        [request addParametersValue:myDelegate.wbCurrentUserID forKey:@"third_uid"];
+//        [request addParametersValue:myDelegate.wbtoken forKey:@"third_token"];
+//        [request GET:User_Login success:^(id responseObject) {
+//            NSMutableDictionary *dic = [responseObject valueForKey:@"data"];
+//            NSLog(@"dic == %@",dic);
+//            
+//            if ([[responseObject valueForKey:@"code"] intValue] == 211) {
+//                QDBindTeleController* bindTeleController = [[QDBindTeleController alloc]initWithParentController:self];
+//                bindTeleController.third_Uid = myDelegate.wbCurrentUserID;
+//                bindTeleController.third_Token = myDelegate.wbtoken;
+//                
+//                WeiboUser *user=(WeiboUser *)result;
+//                NSString *nikename = user.screenName;
+//                bindTeleController.third_Name = nikename;
+//                
+//                [self.navigationController pushViewController:bindTeleController animated:YES];
+//                
+//                return ;
+//            }
+//            NSNumber *code = [responseObject valueForKey:@"code"];
+//            if ([code intValue]==400) {
+//                QDUserGuideViewController *vc = [[QDUserGuideViewController alloc]init];
+//                [self.navigationController pushViewController:vc animated:NO];
+//            }else {
+//                
+//                [[NSUserDefaults standardUserDefaults] setObject:dic forKey:UserInfo];
+//                [[NSUserDefaults standardUserDefaults]setObject:[dic valueForKey:@"token"] forKey:Token];
+//                //            [self dismissViewControllerAnimated:YES completion:^{
+//                if ([parentViewController respondsToSelector:@selector(reloadCallback)]) {
+//                    QDExpertController *exp = parentViewController;
+//                    [exp  reloadCallback];
+//                }
+//                if ([parentViewController isKindOfClass:[QDLoginViewController class]] || [parentViewController isKindOfClass:[QDRegisterViewController class]]) {
+//                    [self.navigationController popToRootViewControllerAnimated:NO];
+//                    //                [parentViewController dismissViewControllerAnimated:NO completion:^{}];
+//                }
+//                //            }];
+//            }
+//            
+//        }];
+//    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

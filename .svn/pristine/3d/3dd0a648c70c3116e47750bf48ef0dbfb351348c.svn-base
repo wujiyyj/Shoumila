@@ -1,0 +1,819 @@
+//
+//  RYGUserCenterViewController.m
+//  shoumila
+//
+//  Created by 贾磊 on 15/7/23.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGUserCenterViewController.h"
+#import "RYGHttpRequest.h"
+#import "RYGUserDetailParam.h"
+#import "RYGPersonalCenterModel.h"
+
+#import "RYGPackageViewController.h"
+#import "RYGDynamicViewController.h"
+#import "RYGVirtualAccountViewController.h"
+#import "RYGSettingViewController.h"
+#import "RYGPersonInfoViewController.h"
+#import "RYGWinLoseViewController.h"
+
+#import "RYGSubscribeViewController.h"
+#import "RYGFansViewController.h"
+#import "RYGCollectionViewController.h"
+
+#import "RYGMyDataTableViewCell.h"
+
+#import "MJRefresh.h"
+#import "UIImageView+RYGWebCache.h"
+#import "RYGGrandeMarkView.h"
+
+#import "RYGLoginViewController.h"
+
+#import "RYGShareViewHandler.h"
+#import "RYGAttentionParam.h"
+
+#import "RYGPersonPackageViewController.h"
+#import "RYGOtherDynamicViewController.h"
+
+#import "MBProgressHUD+MJ.h"
+#import "RYGStringUtil.h"
+
+#define MAX(a,b,c) (a>b?(a>c?a:c):(b>c?b:c))
+
+@interface RYGUserCenterViewController ()
+{
+    UITableView* mainTableView;
+    UIView* headerView;
+    UIView *backView;
+    UIImageView* subscribeImageView;
+    
+    NSString* attentionType;
+    BOOL isFromLogin;
+    
+    float rowHeight;
+    int showChooseType;
+}
+@property(nonatomic,strong) NSMutableArray *datasList;
+@property(nonatomic,strong) RYGPersonalCenterModel *personalCenterModel;
+@property(nonatomic,strong) NSString* shareUrl;
+@property(nonatomic,strong) RYGPersonalUserModel *personalUserModel;
+@property(nonatomic,strong) RYGPersonalDatasModel *personalWeekModel;
+@property(nonatomic,strong) RYGPersonalDatasModel *personalMonthModel;
+@property(nonatomic,strong) RYGPersonalDatasModel *personalNinetyModel;
+
+@end
+
+@implementation RYGUserCenterViewController
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    UIButton* editButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [editButton setFrame:CGRectMake(SCREEN_WIDTH-35, 26, 20, 20)];
+    UIBarButtonItem* rightBarButton = [[UIBarButtonItem alloc]initWithCustomView:editButton];
+    self.navigationItem.rightBarButtonItem = rightBarButton;
+    
+    if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+        [self.tabBarController.tabBar setHidden:NO];
+        self.hidesBottomBarWhenPushed = NO;
+        self.navigationItem.leftBarButtonItem = nil;
+        
+        [editButton setBackgroundImage:[UIImage imageNamed:@"user_setting"] forState:UIControlStateNormal];
+        [editButton addTarget:self action:@selector(editButton:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    else {
+        [self createBottomView];
+        [self.tabBarController.tabBar setHidden:YES];
+        self.hidesBottomBarWhenPushed = YES;
+        //        self.navigationItem.leftBarButtonItem = nil;
+        
+        [editButton setBackgroundImage:[UIImage imageNamed:@"user_more"] forState:UIControlStateNormal];
+        [editButton addTarget:self action:@selector(editMoreButton:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    // 是否登录
+    if (![RYGUtility isLogin])
+    {
+        isFromLogin = YES;
+        RYGLoginViewController *loginViewController = [[RYGLoginViewController alloc]init];
+        loginViewController.isBackHome = YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        //        [[NSNotificationCenter defaultCenter] postNotificationName:kLoginNSNotification object:nil];
+        return;
+    }
+    
+    if (isFromLogin) {
+        [self loadNewData];
+    }
+    
+//    self.navigationItem.hidesBackButton = YES;
+
+//    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"nav_bar"]
+//                                                  forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:[UIImage imageNamed:@"nav_bar"]];
+    
+    [self removeSystemTabBarItem];
+}
+
+- (void)removeSystemTabBarItem
+{
+    for (UIView *subView in self.tabBarController.tabBar.subviews) {
+        if ([subView isKindOfClass:[UIControl class]]) {
+            subView.hidden = YES;
+            [subView removeFromSuperview];
+        }
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+        self.hidesBottomBarWhenPushed = NO;
+        [self.tabBarController.tabBar setHidden:NO];
+    }
+    else {
+        self.hidesBottomBarWhenPushed = NO;
+        [self.tabBarController.tabBar setHidden:NO];
+    }
+    
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    isFromLogin = NO;
+    [self loadNewData];
+    _datasList = [NSMutableArray array];
+    
+    self.navigationItem.title = @"个人中心";
+    
+}
+
+- (void)createBottomView {
+    UIView* bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT-64-49, SCREEN_WIDTH, 49)];
+    bottomView.backgroundColor = ColorRankMyRankBackground;
+    [self.view addSubview:bottomView];
+    
+    UIView* lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 0.5)];
+    lineView.backgroundColor = ColorLine;
+    [bottomView addSubview:lineView];
+    
+    //私人套餐按钮
+    UIButton *privateButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    privateButton.frame = CGRectMake(0, 4, 164, 40);
+    privateButton.centerX = SCREEN_WIDTH/2;
+    privateButton.layer.cornerRadius = 4;
+    [privateButton setBackgroundColor:ColorRankMenuBackground];
+    [privateButton setTitle:@"TA的私人套餐" forState:UIControlStateNormal];
+    privateButton.titleLabel.font = [UIFont systemFontOfSize:15];
+    [privateButton addTarget:self action:@selector(pressprivateButton) forControlEvents:UIControlEventTouchUpInside];
+    [bottomView addSubview:privateButton];
+    
+    UIControl* subscribeControl = [[UIControl alloc]initWithFrame:CGRectMake(15, 0, 48, 49)];
+    subscribeControl.backgroundColor = [UIColor clearColor];
+    [subscribeControl addTarget:self action:@selector(tipSubscribe) forControlEvents:UIControlEventTouchUpInside];
+    [bottomView addSubview:subscribeControl];
+    
+    subscribeImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 12, 19, 24)];
+    if ([attentionType isEqualToString:@"1"]) {
+        attentionType = @"1";
+        subscribeImageView.image = [UIImage imageNamed:@"user_cancelAttention"];
+    }
+    else if ([attentionType isEqualToString:@"2"]) {
+        attentionType = @"0";
+        subscribeImageView.image = [UIImage imageNamed:@"user_attention"];
+    }
+    else {
+        attentionType = @"1";
+        subscribeImageView.image = [UIImage imageNamed:@"user_cancelAttention"];
+    }
+    
+    [subscribeControl addSubview:subscribeImageView];
+    
+    UILabel* subscribeLabel = [[UILabel alloc]initWithFrame:CGRectMake(24, 12, 24, 24)];
+    subscribeLabel.text = @"关注";
+    subscribeLabel.textColor = ColorTabBarButtonTitle;
+    subscribeLabel.font = [UIFont systemFontOfSize:12];
+    [subscribeControl addSubview:subscribeLabel];
+    
+    
+    //动态
+    UIControl* dynamicControl = [[UIControl alloc]initWithFrame:CGRectMake(SCREEN_WIDTH-15-48, 0, 48, 49)];
+    dynamicControl.backgroundColor = [UIColor clearColor];
+    [dynamicControl addTarget:self action:@selector(tipDynamic) forControlEvents:UIControlEventTouchUpInside];
+    [bottomView addSubview:dynamicControl];
+    
+    UIImageView* dynamicImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 12, 19, 24)];
+    dynamicImageView.image = [UIImage imageNamed:@"user_trends"];
+    [dynamicControl addSubview:dynamicImageView];
+    
+    UILabel* dynamicLabel = [[UILabel alloc]initWithFrame:CGRectMake(24, 12, 24, 24)];
+    dynamicLabel.text = @"动态";
+    dynamicLabel.textColor = ColorTabBarButtonTitle;
+    dynamicLabel.font = [UIFont systemFontOfSize:12];
+    [dynamicControl addSubview:dynamicLabel];
+}
+
+- (void)pressprivateButton {
+    
+    if ([_personalUserModel.can_edit intValue] == 0) {
+        UIAlertView* alertView = [[UIAlertView alloc]initWithTitle:@"提示" message:@"该用户并未开启私人套餐" delegate:self cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+        [alertView show];
+    }
+    else {
+        //TA的私人套餐
+        RYGPersonPackageViewController* personPackageVC = [[RYGPersonPackageViewController alloc]init];
+        personPackageVC.userid = _personalUserModel.userid;
+        [self.navigationController pushViewController:personPackageVC animated:YES];
+    }
+}
+
+- (void)tipSubscribe {
+    //关注
+    RYGAttentionParam *attentionParam = [RYGAttentionParam param];
+    attentionParam.userid = _personalUserModel.userid;
+    attentionParam.op = attentionType;
+    [RYGHttpRequest postWithURL:User_Attention params:attentionParam.keyValues success:^(id json) {
+        NSNumber *code = [json valueForKey:@"code"];
+        if (code && code.integerValue == 0) {
+            //关注成功
+            if ([attentionType isEqualToString:@"1"]) {
+                attentionType = @"0";
+                subscribeImageView.image = [UIImage imageNamed:@"user_attention"];
+                
+                [MBProgressHUD show:@"已取消关注" icon:nil view:nil];
+            }
+            else if ([attentionType isEqualToString:@"0"]) {
+                attentionType = @"1";
+                subscribeImageView.image = [UIImage imageNamed:@"user_cancelAttention"];
+                
+                [MBProgressHUD show:@"关注成功" icon:nil view:nil];
+            }
+            
+        }
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)tipDynamic {
+    //动态
+    RYGOtherDynamicViewController* otherDynamicVC = [[RYGOtherDynamicViewController alloc]init];
+    otherDynamicVC.userid = _personalUserModel.userid;
+    [self.navigationController pushViewController:otherDynamicVC animated:YES];
+}
+
+- (void)createMainView {
+    
+    mainTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-64-48) style:UITableViewStylePlain];
+    mainTableView.delegate = self;
+    mainTableView.dataSource = self;
+    [mainTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
+    [mainTableView registerClass:[RYGMyDataTableViewCell class] forCellReuseIdentifier:@"MyDataCell"];
+    mainTableView.tableHeaderView = headerView;
+    mainTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.view addSubview:mainTableView];
+    
+    rowHeight = 220;
+    
+    __weak __typeof(&*self)weakself = self;
+    [mainTableView addLegendHeaderWithRefreshingBlock:^{
+        [weakself loadNewData];
+    }];
+}
+
+- (void)createHeaderView {
+    headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 160)];
+    headerView.userInteractionEnabled = YES;
+    headerView.backgroundColor = ColorRankMenuBackground;
+    
+    UIImageView* photoImageView = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/2-38, 14, 76, 76)];
+    photoImageView.userInteractionEnabled = YES; 
+    [photoImageView setImageURLStr:_personalUserModel.user_logo placeholder:[UIImage imageNamed:@"user_head"]];
+    photoImageView.center = CGPointMake(SCREEN_WIDTH/2, 52);
+    photoImageView.layer.masksToBounds = YES;
+    photoImageView.layer.cornerRadius = 38;
+    photoImageView.layer.borderWidth = 3;
+    photoImageView.layer.borderColor = ColorGreen.CGColor;
+    [headerView addSubview:photoImageView];
+    
+    UIButton* photoButton = [self createButtonFrame:CGRectMake(0, 0, 76, 76) withImage:nil withTag:0];
+    if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+        photoButton.enabled = YES;
+    }
+    else {
+        photoButton.enabled = NO;
+    }
+    [photoImageView addSubview:photoButton];
+    
+    //个人账户信息
+    self.navigationItem.title = _personalUserModel.user_name;
+    
+    //等级
+    UILabel* levelLabel = [self createLabelFrame:CGRectMake(SCREEN_WIDTH/2-18, 100, 36, 16) withAlignment:NSTextAlignmentCenter withFont:[UIFont boldSystemFontOfSize:14] withColor:[UIColor colorWithHexadecimal:@"#feaf00"] withText:[NSString stringWithFormat:@"lv.%@",_personalUserModel.grade]];
+    [headerView addSubview:levelLabel];
+    
+    // 周等级标志
+    UIImageView* rankweekImageView = [[UIImageView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2-58, 100, 10, 15)];
+    if ([_personalUserModel.rank_week isEqualToString:@"1"] || [_personalUserModel.rank_week isEqualToString:@"2"] || [_personalUserModel.rank_week isEqualToString:@"3"]) {
+        rankweekImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"week_rank_ medal%@",_personalUserModel.rank_week]];
+    }
+    else {
+        rankweekImageView.hidden = YES;
+    }
+    [headerView addSubview:rankweekImageView];
+    
+    // 月等级标志
+    UIImageView* rankmonthImageView = [[UIImageView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2-43, 100, 16, 15)];
+    if ([_personalUserModel.rank_month isEqualToString:@"1"] || [_personalUserModel.rank_month isEqualToString:@"2"] || [_personalUserModel.rank_month isEqualToString:@"3"]) {
+        rankmonthImageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"month_rank_ medal%@",_personalUserModel.rank_month]];
+    }
+    else {
+        rankmonthImageView.hidden = YES;
+        rankweekImageView.frame = CGRectMake(SCREEN_WIDTH/2-43, 100, 10, 15);
+    }
+    [headerView addSubview:rankmonthImageView];
+    
+    
+    CGFloat win_tagLen = [RYGStringUtil getLabelLength:[NSString stringWithFormat:@"%@:",_personalUserModel.win_tag] font:[UIFont systemFontOfSize:12] height:15]+5;
+    UILabel *win_tag_label = [self createLabelFrame:CGRectMake(SCREEN_WIDTH/2+25, 100, win_tagLen, 15) withAlignment:NSTextAlignmentCenter withFont:[UIFont systemFontOfSize:12] withColor:[UIColor whiteColor] withText:[NSString stringWithFormat:@"%@", _personalUserModel.win_tag]];
+    if ([_personalUserModel.win_tag isEqualToString:@""]) {
+        win_tag_label.hidden = YES;
+    }
+    win_tag_label.layer.cornerRadius = 2;
+    win_tag_label.layer.masksToBounds = YES;
+    win_tag_label.backgroundColor = ColorRateTitle;
+    [headerView addSubview:win_tag_label];
+    
+    CGFloat max_continuousLen = [RYGStringUtil getLabelLength:[NSString stringWithFormat:@"%@:",_personalUserModel.max_continuous_tag] font:[UIFont systemFontOfSize:12] height:15]+5;
+    UILabel *max_continuous_label = [self createLabelFrame:CGRectMake(SCREEN_WIDTH/2+25+win_tagLen+5, 100, max_continuousLen, 15) withAlignment:NSTextAlignmentCenter withFont:[UIFont systemFontOfSize:12] withColor:[UIColor whiteColor] withText:[NSString stringWithFormat:@"%@", _personalUserModel.max_continuous_tag]];
+    if ([_personalUserModel.win_tag isEqualToString:@""]) {
+        max_continuous_label.frame = CGRectMake(SCREEN_WIDTH/2+25, 100, 35, 15);
+    }
+    if ([_personalUserModel.max_continuous_tag isEqualToString:@""]) {
+        max_continuous_label.hidden = YES;
+    }
+    max_continuous_label.layer.masksToBounds = YES;
+    max_continuous_label.layer.cornerRadius = 2;
+    max_continuous_label.backgroundColor = ColorRateTitle;
+    [headerView addSubview:max_continuous_label];
+    
+    
+    
+    
+    //点赞按钮
+    UIButton* praiseButton = [self createButtonFrame:CGRectMake(SCREEN_WIDTH-65, 15, 50, 21) withImage:@"user_praise" withTag:1];
+    [headerView addSubview:praiseButton];
+    
+    UILabel* praiseLabel = [self createLabelFrame:CGRectMake(22, 2, 25, 17) withAlignment:NSTextAlignmentCenter withFont:[UIFont systemFontOfSize:12] withColor:[UIColor whiteColor] withText:_personalUserModel.user_praise_num];
+    [praiseButton addSubview:praiseLabel];
+    
+    NSArray* itemNameArray = [NSArray arrayWithObjects:[NSString stringWithFormat:@"关注：%@",_personalUserModel.attention_num],[NSString stringWithFormat:@"粉丝：%@",_personalUserModel.funs_num],[NSString stringWithFormat:@"收藏：%@",_personalUserModel.favorite_num], nil];
+    
+    //操作按钮
+    for (int i=0; i<3; i++) {
+        UIButton* itemButton = [self createButtonFrame:CGRectMake(i*SCREEN_WIDTH/3, 130, SCREEN_WIDTH/3, 60) withImage:nil withTag:i+10];
+        [headerView addSubview:itemButton];
+        
+        UILabel* itemNameLabel = [self createLabelFrame:CGRectMake(0, 5, SCREEN_WIDTH/3, 20) withAlignment:NSTextAlignmentCenter withFont:[UIFont boldSystemFontOfSize:12] withColor:[UIColor whiteColor] withText:[itemNameArray objectAtIndex:i]];
+        [itemButton addSubview:itemNameLabel];
+    }
+    
+}
+
+-(UILabel*)createLabelFrame:(CGRect)frame withAlignment:(NSTextAlignment)alignment withFont:(UIFont*)font withColor:(UIColor*)color withText:(NSString*)text
+{
+    UILabel* label = [[UILabel alloc]initWithFrame:frame];
+    label.textAlignment = alignment;
+    label.font = font;
+    label.numberOfLines = 1;
+    label.textColor = color;
+    label.text = text;
+    return label;
+}
+
+-(UIButton*)createButtonFrame:(CGRect)frame withImage:(NSString*)image    withTag:(NSInteger)tag
+{
+    UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = frame;
+    [button setImage:[UIImage imageNamed:image] forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(pressButton:) forControlEvents:UIControlEventTouchUpInside];
+    button.tag = tag;
+    return button;
+}
+
+- (void)editButton:(UIBarButtonItem*)button
+{
+    //设置
+    RYGSettingViewController* settingController = [[RYGSettingViewController alloc]init];
+    settingController.user_logo = _personalUserModel.user_logo;
+    settingController.userId = _personalUserModel.userid;
+    settingController.user_name = _personalUserModel.user_name;
+    
+    [self.navigationController pushViewController:settingController animated:YES];
+    
+}
+
+- (void)editMoreButton:(UIBarButtonItem*)button
+{
+    RYGShareViewHandler *handler = [RYGShareViewHandler shareInstance];
+    RYGShareContentModel *contentModel = [[RYGShareContentModel alloc]init];
+    contentModel.userid = _personalUserModel.userid;
+//    contentModel.content = _goodsDetailModel.g_name;
+    contentModel.shareUrl = _shareUrl;
+    contentModel.mediaType = SSPublishContentMediaTypeNews;
+    handler.contentModel = contentModel;
+}
+
+-(void)pressButton:(UIButton*)button
+{
+    if (button.tag == 0) {
+        //点击头像
+        RYGPersonInfoViewController* personInfo = [[RYGPersonInfoViewController alloc]init];
+        [self.navigationController pushViewController:personInfo animated:YES];
+    }
+    
+    if (button.tag == 1) {
+        //点赞
+        if ([_personalUserModel.is_praise intValue] == 1) {
+//            [self clickAttentionButton:@"1"];
+            [MBProgressHUD showError:@"不能重复点赞"];
+        }
+        else if ([_personalUserModel.is_praise intValue] == 2){
+            [self clickAttentionButton:@"0"];
+        }
+    }
+    else if (button.tag == 10) {
+        //订阅
+        RYGSubscribeViewController* subcribeController = [[RYGSubscribeViewController alloc]init];
+        subcribeController.userid = _personalUserModel.userid;
+        [self.navigationController pushViewController:subcribeController animated:YES];
+    }
+    else if (button.tag == 11) {
+        //粉丝
+        RYGFansViewController* fansController = [[RYGFansViewController alloc]init];
+        fansController.userid = _personalUserModel.userid;
+        [self.navigationController pushViewController:fansController animated:YES];
+    }
+    else if (button.tag == 12) {
+        //收藏
+        RYGCollectionViewController* collectionController = [[RYGCollectionViewController alloc]init];
+        collectionController.userid = _personalUserModel.userid;
+        [self.navigationController pushViewController:collectionController animated:YES];
+        
+    }
+}
+
+- (void)clickAttentionButton:(NSString*)isPraise
+{
+    RYGAttentionParam *attentionParam = [RYGAttentionParam param];
+    attentionParam.userid = _personalUserModel.userid;
+    attentionParam.op = isPraise;
+    [RYGHttpRequest postWithURL:User_UserPraise params:attentionParam.keyValues success:^(id json) {
+        NSNumber *code = [json valueForKey:@"code"];
+        if (code && code.integerValue == 0) {
+            //点赞成功
+            [MBProgressHUD showSuccess:@"点赞成功"];
+            
+            [self loadNewData];
+            
+        }
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+//UITableView delegate和datasource方法
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+        return 4;
+    }
+    else {
+        return 1;
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (section == 1) {
+        return 10;
+    }
+    return 0;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0 && indexPath.row == 1) {
+        return rowHeight;
+    }
+    return 44;
+}
+
+//以下两个方法必实现
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (section == 0) {
+        return 2;
+    }
+    return 1;
+}
+
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0 && indexPath.row == 1) {
+    
+        RYGMyDataTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"MyDataCell" forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        
+        cell.tapWinLoseBlock = ^{
+            RYGWinLoseViewController* winLoseController = [[RYGWinLoseViewController alloc] init];
+            winLoseController.userid = _personalUserModel.userid;
+            [self.navigationController pushViewController:winLoseController animated:YES];
+        };
+        
+        cell.tapYpslBlock = ^(NSInteger tag){
+            
+            [self showYpslAlertView:tag];
+        };
+        cell.tapDxqslBlock = ^(NSInteger tag){
+            [self showDxqslAlertView:tag];
+        };
+        cell.tapJcslBlock = ^(NSInteger tag){
+            [self showJcslAlertView:tag];
+        };
+        cell.tapPjtjswBlock = ^(NSInteger tag){
+            [self showPjtjswAlertView:tag];
+        };
+        cell.tapZglhBlock = ^(NSInteger tag){
+            [self showZglhAlertView:tag];
+        };
+        cell.tapWdxBlock = ^(NSInteger tag){
+            [self showWdxAlertView:tag];
+        };
+        
+        
+        if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+            
+            //自己的个人中心
+            cell.dataBlock = ^{
+                rowHeight = 220;
+                [mainTableView reloadData];
+            };
+            cell.timeBlock = ^{
+                rowHeight = 433;
+                [mainTableView reloadData];
+            };
+        }
+        else {
+            //他人的个人中心
+            int MaxProfit = MAX(_personalWeekModel.profit_margin.intValue, _personalMonthModel.profit_margin.intValue, _personalNinetyModel.profit_margin.intValue);
+            rowHeight = 433;
+            if (MaxProfit > 0) {
+                cell.contentView.height = 433;
+                cell.scrollView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 433);
+                //选择最大的数
+                if (MaxProfit == _personalWeekModel.profit_margin.intValue) {
+                    cell.scrollView.contentOffset = CGPointMake(SCREEN_WIDTH, 0);
+                    cell.pageControl.currentPage = 1;
+                }
+                else if (MaxProfit == _personalMonthModel.profit_margin.intValue) {
+                    cell.scrollView.contentOffset = CGPointMake(SCREEN_WIDTH*2, 0);
+                    cell.pageControl.currentPage = 2;
+                }
+                else if (MaxProfit == _personalNinetyModel.profit_margin.intValue) {
+                    cell.scrollView.contentOffset = CGPointMake(SCREEN_WIDTH*3, 0);
+                    cell.pageControl.currentPage = 3;
+                }
+            }
+            else {
+                //默认选择操作页面
+                
+                cell.scrollView.contentOffset = CGPointMake(0, 0);
+                cell.pageControl.currentPage = 0;
+            }
+        }
+        
+        [cell setUserDataModel:_personalUserModel];
+        [cell setWeekDataModel:_personalWeekModel];
+        [cell setMonthDataModel:_personalMonthModel];
+        [cell setNinetyDataModel:_personalNinetyModel];
+        
+        return cell;
+    }
+    else {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        if (indexPath.section == 0 && indexPath.row == 0) {
+            cell.imageView.image = [UIImage imageNamed:@"user_data"];
+            if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+                cell.textLabel.text = @"我的数据";
+            }
+            else {
+                cell.textLabel.text = @"TA的数据";
+            }
+            
+            cell.accessoryType = UITableViewCellAccessoryNone;
+            
+            UIView* lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 43.5, SCREEN_WIDTH, 0.5)];
+            lineView.backgroundColor = ColorLine;
+            [cell.contentView addSubview:lineView];
+        }
+        else if (indexPath.section == 1) {
+            cell.imageView.image = [UIImage imageNamed:@"user_package"];
+            cell.textLabel.text = @"私人套餐";
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            
+            UIView* top_lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 0.5)];
+            top_lineView.backgroundColor = ColorLine;
+            [cell.contentView addSubview:top_lineView];
+            
+            UIView* bottom_lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 43.5, SCREEN_WIDTH, 0.5)];
+            bottom_lineView.backgroundColor = ColorLine;
+            [cell.contentView addSubview:bottom_lineView];
+            
+        }
+        else if (indexPath.section == 2) {
+            cell.imageView.image = [UIImage imageNamed:@"user_trend"];
+            cell.textLabel.text = @"我的动态";
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            
+            UIView* bottom_lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 43.5, SCREEN_WIDTH, 0.5)];
+            bottom_lineView.backgroundColor = ColorLine;
+            [cell.contentView addSubview:bottom_lineView];
+        }
+        else if (indexPath.section == 3) {
+            cell.imageView.image = [UIImage imageNamed:@"user_account"];
+            cell.textLabel.text = @"我的账户";
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            
+            UIView* bottom_lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 43.5, SCREEN_WIDTH, 0.5)];
+            bottom_lineView.backgroundColor = ColorLine;
+            [cell.contentView addSubview:bottom_lineView];
+        }
+        return cell;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 1) {
+        //跳转私人套餐
+        RYGPackageViewController* packageController = [[RYGPackageViewController alloc]init];
+        [self.navigationController pushViewController:packageController animated:YES];
+        
+    }
+    else if (indexPath.section == 2) {
+        //跳转我的动态
+        RYGDynamicViewController* dynamicController = [[RYGDynamicViewController alloc]init];
+        [self.navigationController pushViewController:dynamicController animated:YES];
+    }
+    else if (indexPath.section == 3) {
+        //跳转我的账户
+        RYGVirtualAccountViewController* virtualAccountVC = [[RYGVirtualAccountViewController alloc]init];
+        virtualAccountVC.money = _personalUserModel.money;
+        [self.navigationController pushViewController:virtualAccountVC animated:YES];
+        
+    }
+}
+
+- (void)loadNewData{
+    RYGUserDetailParam *userDetailParam = [RYGUserDetailParam param];
+    userDetailParam.userid = _userId;
+    userDetailParam.user_name = _user_name;
+    [RYGHttpRequest postWithURL:User_Personal_center params:userDetailParam.keyValues success:^(id json) {
+        
+        NSMutableDictionary *dic = [json valueForKey:@"data"];
+        _personalCenterModel = [RYGPersonalCenterModel objectWithKeyValues:dic];
+        NSLog(@"_personalCenterModel = %@",_personalCenterModel);
+        
+//        NSString *path = [DOC_PATH stringByAppendingPathComponent:@"user.data"];
+//        [NSKeyedArchiver archiveRootObject:_personalCenterModel.user toFile:path];
+        _personalWeekModel = _personalCenterModel.week;
+        _personalMonthModel = _personalCenterModel.month;
+        _personalNinetyModel = _personalCenterModel.ninety;
+        _personalUserModel = _personalCenterModel.user;
+        _shareUrl = _personalCenterModel.share_url;
+        [mainTableView.header setState:MJRefreshHeaderStateIdle];
+        
+        attentionType = _personalUserModel.is_attention;
+        
+        [self reloadData];
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)reloadData
+{
+    [self createHeaderView];
+    [self createMainView];
+    if ((_userId == nil || [_userId isEqualToString:@""]) && (_user_name == nil || [_user_name isEqualToString:@""])) {
+    }
+    else {
+        [self createBottomView];
+    }
+}
+
+- (void)showYpslAlertView:(NSInteger)tag {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+    if (tag == 1) {
+        alert.message = @"用户近7天（让球）胜率=推荐让球赢的次数/周推荐让球次数 PS：不计算走水/无效场次";
+    }
+    else if (tag == 2) {
+        alert.message = @"用户近30天（让球）胜率=推荐让球赢的次数/月推荐让球次数 PS：不计算走水/无效场次";
+    }
+    else if (tag == 3) {
+        alert.message = @"用户近90天（让球）胜率=推荐让球赢的次数/季推荐让球次数 PS：不计算走水/无效场次";
+    }
+    [alert show];
+}
+
+- (void)showDxqslAlertView:(NSInteger)tag {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+    if (tag == 1) {
+        alert.message = @"用户近7天（大小球）胜率=推荐大小球赢的次数/周推荐大小球次数 ps：不计算走水/无效场次";
+    }
+    else if (tag == 2) {
+        alert.message = @"用户近30天（大小球）胜率=推荐大小球赢的次数/月推荐大小球次数 ps：不计算走水/无效场次";
+    }
+    else if (tag == 3) {
+        alert.message = @"用户近90天（大小球）胜率=推荐大小球赢的次数/季推荐大小球次数 ps：不计算走水/无效场次";
+    }
+    [alert show];
+}
+
+- (void)showJcslAlertView:(NSInteger)tag {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+    if (tag == 1) {
+        alert.message = @"用户近7天（胜平负）胜率=推荐胜平负赢的次数/周推荐胜平负次数  不计算走水/无效场次";
+    }
+    else if (tag == 2) {
+        alert.message = @"用户近30天（胜平负）胜率=推荐胜平负赢的次数/月推荐胜平负次数  不计算走水/无效场次";
+    }
+    else if (tag == 3) {
+        alert.message = @"用户近90天（胜平负）胜率=推荐胜平负赢的次数/季推荐胜平负次数  不计算走水/无效场次";
+    }
+    [alert show];
+}
+
+- (void)showPjtjswAlertView:(NSInteger)tag {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+    if (tag == 1) {
+        alert.message = @"用户近7天推荐的平均SP值，俗称“水位”，这里所计算的平均推荐水位不包含本金1，是该用户近7天所推荐的赔率总和/总共推荐次数 ；由于胜平负赔率包含本金所以在计算的时候会扣除本金1";
+    }
+    else if (tag == 2) {
+        alert.message = @"用户近30天推荐的平均SP值，俗称“水位”，这里所计算的平均推荐水位不包含本金1，是该用户近30天所推荐的赔率总和/总共推荐次数 ；由于胜平负赔率包含本金所以在计算的时候会扣除本金1";
+    }
+    else if (tag == 3) {
+        alert.message = @"用户近90天推荐的平均SP值，俗称“水位”，这里所计算的平均推荐水位不包含本金1，是该用户近90天所推荐的赔率总和/总共推荐次数 ；由于胜平负赔率包含本金所以在计算的时候会扣除本金1";
+    }
+    [alert show];
+}
+
+- (void)showZglhAlertView:(NSInteger)tag {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+    if (tag == 1) {
+        alert.message = @"用户近7天推荐的历史记录中最高连红次数";
+    }
+    else if (tag == 2) {
+        alert.message = @"用户近30天推荐的历史记录中最高连红次数";
+    }
+    else if (tag == 3) {
+        alert.message = @"用户近90天推荐的历史记录中最高连红次数";
+    }
+    [alert show];
+}
+
+- (void)showWdxAlertView:(NSInteger)tag {
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"提示" message:@"稳定性是反映用户推荐的稳定情况，稳定性越好说明该用户的推荐出现连黑情况就会越少发生；收米啦利用专业的数据统计为大家呈现出每位推荐达人的稳定性情况并提供4项等级指标以供参考：优＞良＞中＞差" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+    [alert show];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

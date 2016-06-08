@@ -1,0 +1,178 @@
+//
+//  RYGSelectorView.m
+//  shoumila
+//
+//  Created by 贾磊 on 15/8/29.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGSelectorView.h"
+
+@interface RYGSelectorView ()<UICollectionViewDataSource,UICollectionViewDelegate>
+@property(nonatomic,strong)UICollectionView *collectionView;
+@property(nonatomic,strong)NSArray *data;
+@property(nonatomic,strong)NSMutableArray *selectedItems;
+@property(nonatomic,strong)NSMutableArray *allItems;
+@end
+
+@implementation RYGSelectorView
+
+-(instancetype)initWithData:(NSArray *)data{
+    self = [super init];
+    if (self) {
+        _data = data;
+        _selectedItems = [NSMutableArray array];
+        _allItems = [NSMutableArray array];
+    }
+    return self;
+}
+
+-(instancetype)initWithFrame:(CGRect)frame{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.bounds = CGRectMake(0, 0, 270, 324);
+        self.backgroundColor = [UIColor whiteColor];
+        
+        UILabel *label = [[UILabel alloc]init];
+        label.frame = CGRectMake(15, 20, 30, 18);
+        label.font = [UIFont systemFontOfSize:15];
+        label.textColor = ColorName;
+        label.text = @"筛选";
+        [self addSubview:label];
+        
+        UIButton *selectBtn = [[UIButton alloc]init];
+        selectBtn.frame = CGRectMake(self.width - 131, 20, 48, 23);
+        [selectBtn setTitle:@"全选" forState:UIControlStateNormal];
+        selectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        selectBtn.layer.borderColor = ColorLine.CGColor;
+        selectBtn.layer.borderWidth = 0.5;
+        selectBtn.layer.cornerRadius = 2.0;
+        [selectBtn setTitleColor:ColorSecondTitle forState:UIControlStateNormal];
+        [selectBtn addTarget:self action:@selector(selectAllBtnAction) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:selectBtn];
+        
+        UIButton *unSelectBtn = [[UIButton alloc]init];
+        unSelectBtn.frame = CGRectMake(self.width - 68, 20, 48, 23);
+        [unSelectBtn setTitle:@"反选" forState:UIControlStateNormal];
+        unSelectBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        unSelectBtn.layer.borderColor = ColorLine.CGColor;
+        unSelectBtn.layer.borderWidth = 0.5;
+        unSelectBtn.layer.cornerRadius = 2.0;
+        [unSelectBtn setTitleColor:ColorSecondTitle forState:UIControlStateNormal];
+        [unSelectBtn addTarget:self action:@selector(unSelectBtnAction) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:unSelectBtn];
+        
+        UIView *line = [[UIView alloc]initWithFrame:CGRectMake(15, CGRectGetMaxY(label.frame)+15, self.width - 30, 0.5)];
+        line.backgroundColor = ColorLine;
+        [self addSubview:line];
+        
+        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc]init];
+        flowLayout.itemSize = CGSizeMake(59, 30);
+        flowLayout.sectionInset = UIEdgeInsetsMake(15, 15, 15, 15);
+        _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(line.frame), self.width, 200) collectionViewLayout:flowLayout];
+        [_collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        _collectionView.delegate = self;
+        _collectionView.dataSource = self;
+        _collectionView.backgroundColor = [UIColor whiteColor];
+        [self addSubview:_collectionView];
+        
+        UIButton *cancelBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, CGRectGetMaxY(_collectionView.frame)+15, 105, 30)];
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = [UIFont systemFontOfSize:15];
+        cancelBtn.backgroundColor = ColorRankMedal;
+        cancelBtn.layer.cornerRadius = 4.0;
+        [cancelBtn addTarget:self action:@selector(cancelAction) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:cancelBtn];
+        
+        UIButton *confirmBtn = [[UIButton alloc]initWithFrame:CGRectMake(145, CGRectGetMaxY(_collectionView.frame)+15, 105, 30)];
+        [confirmBtn setTitle:@"确定" forState:UIControlStateNormal];
+        [confirmBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        confirmBtn.titleLabel.font = [UIFont systemFontOfSize:15];
+        confirmBtn.backgroundColor = ColorRateTitle;
+        confirmBtn.layer.cornerRadius = 4.0;
+        [confirmBtn addTarget:self action:@selector(confirmAction) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:confirmBtn];
+    }
+    return self;
+}
+
+#pragma mark UICollectionViewDataSource
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    return _data.count;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    UIButton *cellView = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, cell.width, cell.height)];
+    [cellView setTitle:_data[indexPath.row] forState:UIControlStateNormal];
+    [cellView setTitleColor:ColorName forState:UIControlStateNormal];
+    [cellView setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    cellView.tag = indexPath.row;
+    cellView.titleLabel.font = [UIFont systemFontOfSize:14];
+    cellView.layer.borderWidth = 1;
+    cellView.layer.borderColor = ColorRankMedal.CGColor;
+    cellView.layer.cornerRadius = 2.0;
+    cell.backgroundView =cellView;
+    [_allItems addObject:cellView];
+    return cell;
+}
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    UIButton *cellView = (UIButton *)cell.backgroundView;
+    NSString *item = cellView.titleLabel.text;
+    if ([_selectedItems containsObject:item]) {
+        [cellView setTitleColor:ColorName forState:UIControlStateNormal];
+        cellView.backgroundColor = [UIColor whiteColor];
+        [_selectedItems removeObject:item];
+    }else{
+        [cellView setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        cellView.backgroundColor = ColorAttionCanBackground;
+        [_selectedItems addObject:item];
+    }
+    
+}
+- (void)selectAllBtnAction{
+    _selectedItems = [NSMutableArray arrayWithArray:_data];
+    [_allItems enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        UIButton *cellView = obj;
+        [cellView setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        cellView.backgroundColor = ColorAttionCanBackground;
+    }];
+}
+
+-(void)unSelectBtnAction{
+    [_allItems enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        UIButton *cellView = obj;
+        NSString *item = cellView.titleLabel.text;
+        if ([_selectedItems containsObject:item]) {
+            [cellView setTitleColor:ColorName forState:UIControlStateNormal];
+            cellView.backgroundColor = [UIColor whiteColor];
+            [_selectedItems removeObject:item];
+        }else{
+            [cellView setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            cellView.backgroundColor = ColorAttionCanBackground;
+            [_selectedItems addObject:item];
+        }
+    }];
+}
+
+- (void)confirmAction{
+    if (_confirmBlock) {
+        NSMutableString *str = [NSMutableString string];
+        [_selectedItems enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            [str appendString:obj];
+            [str appendString:@","];
+        }];
+        _confirmBlock(str);
+    }
+}
+- (void)cancelAction{
+    if (_cancelBlock) {
+        _cancelBlock();
+    }
+}
+
+
+@end

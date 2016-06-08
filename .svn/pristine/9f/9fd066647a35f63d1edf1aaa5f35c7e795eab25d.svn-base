@@ -1,0 +1,230 @@
+//
+//  RYGPack1ViewController.m
+//  shoumila
+//
+//  Created by yinyujie on 15/7/30.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+//我购买的
+#import "RYGPack1ViewController.h"
+#import "RYGBuyPackageTableViewCell.h"
+#import "RYGAllListParam.h"
+#import "RYGHttpRequest.h"
+#import "RYGPackageBoughtListModel.h"
+#import "RYGOrderDetailViewController.h"
+#import "RYGApplyRefundViewController.h"
+#import "MJRefresh.h"
+
+@interface RYGPack1ViewController ()<UITableViewDelegate,UITableViewDataSource,RYGBuyPackageTableViewCellDelegate>
+{
+    UITableView* mTableView;
+}
+
+@property(nonatomic,strong) RYGPackageBoughtListModel *boughtListModel;
+@property(nonatomic,strong) NSMutableArray* boughtListArray;
+@property(nonatomic,assign) BOOL hasMoreData;
+@property(nonatomic,copy)   NSString *next;
+
+@end
+
+@implementation RYGPack1ViewController
+
+-(void)loadView{
+    [super loadView];
+    _boughtListArray = [[NSMutableArray alloc]init];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [_boughtListArray removeAllObjects];
+}
+
+- (void)loadNewData{
+    RYGAllListParam *listParam = [RYGAllListParam param];
+    listParam.count = @"5";
+    listParam.next = _next;
+    [RYGHttpRequest postWithURL:Package_Bought params:listParam.keyValues success:^(id json) {
+        
+        NSMutableDictionary *dic = [json valueForKey:@"data"];
+        self.boughtListModel = [RYGPackageBoughtListModel objectWithKeyValues:dic];
+        [_boughtListArray  addObjectsFromArray:self.boughtListModel.datas];
+        
+        _next = self.boughtListModel.next;
+        // 没有加载更多
+        if ([self.boughtListModel.page_is_last isEqualToString:@"0"]) {
+            _hasMoreData = YES;
+        }
+        else {
+            _hasMoreData = NO;
+        }
+        [mTableView.header setState:MJRefreshHeaderStateIdle];
+        
+        if (_boughtListArray.count == 0) {
+            mTableView.hidden = YES;
+            [self createEmptyView];
+        }
+        else {
+            mTableView.hidden = NO;
+            [self reloadData];
+        }
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)reloadData
+{
+    [mTableView.footer endRefreshing];
+    if (!_hasMoreData) {
+        [mTableView.footer setState:MJRefreshFooterStateNoMoreData];
+    }
+    [mTableView reloadData];
+    
+}
+
+- (void)createEmptyView{
+    UIImageView* emptyImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 135, 80, 80)];
+    emptyImageView.centerX = SCREEN_WIDTH/2;
+    emptyImageView.image = [UIImage imageNamed:@"default_picture"];
+    [self.view addSubview:emptyImageView];
+    
+    UILabel* emptyLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 235, 150, 20)];
+    emptyLabel.centerX = SCREEN_WIDTH/2;
+    emptyLabel.text = @"您寻找的内容不存在";
+    emptyLabel.textAlignment = NSTextAlignmentCenter;
+    emptyLabel.textColor = ColorSecondTitle;
+    emptyLabel.font = [UIFont systemFontOfSize:14];
+    [self.view addSubview:emptyLabel];
+}
+
+- (void)createTableView
+{
+    mTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,SCREEN_HEIGHT-64) style:UITableViewStylePlain];
+    mTableView.delegate = self;
+    mTableView.dataSource = self;
+    [mTableView registerClass:[RYGBuyPackageTableViewCell class] forCellReuseIdentifier:@"Cell"];
+    mTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    __weak __typeof(&*self)weakself = self;
+    [mTableView addLegendHeaderWithRefreshingBlock:^{
+        [weakself aRefresh];
+    }];
+    __weak __typeof(&*self)weakself1 = self;
+    [mTableView addLegendFooterWithRefreshingBlock:^{
+        [weakself1 loadNewData];
+    } noMoreDataTitle:@"没有更多数据"];
+    [self.view addSubview:mTableView];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.view.backgroundColor = ColorRankMyRankBackground;
+    
+    [self createTableView];
+    
+    [self aRefresh];
+}
+
+#pragma mark 初期刷新，下拉刷新
+- (void)aRefresh {
+    _boughtListArray = [[NSMutableArray alloc]init];
+    _next = @"0";
+    _hasMoreData = YES;
+    [self loadNewData];
+}
+
+//UITableView delegate和datasource方法
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return _boughtListArray.count;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    if (section == _boughtListArray.count-1) {
+        return 0;
+    }
+    return 10;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 188;
+}
+
+//以下两个方法必实现
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    RYGBuyPackageTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    
+//    //修改UITableview服用重叠的问题
+//    for(UIView *view in cell.contentView.subviews) {
+//        [view removeFromSuperview];
+//    }
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    cell.packageBoughtModel = _boughtListArray[indexPath.section];
+    cell.delegate = self;
+    
+    UIView* toplineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 0.5)];
+    toplineView.backgroundColor = ColorLine;
+    [cell.contentView addSubview:toplineView];
+    
+    UIView* bottomlineView = [[UIView alloc]initWithFrame:CGRectMake(0, 187.5, SCREEN_WIDTH, 0.5)];
+    bottomlineView.backgroundColor = ColorLine;
+    [cell.contentView addSubview:bottomlineView];
+    
+    return cell;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+//RYGBuyPackageTableViewCell  Delegate
+- (void)clickDYButton:(NSString *)order_no {
+    NSLog(@"order_no = %@",order_no);
+    RYGOrderDetailViewController* orderDetailVC = [[RYGOrderDetailViewController alloc]init];
+    orderDetailVC.order_no = order_no;
+    [self.navigationController pushViewController:orderDetailVC animated:YES];
+}
+
+- (void)clickTKButton:(NSString *)order_no {
+    NSLog(@"order_no ==== %@",order_no);
+    RYGApplyRefundViewController* applyRefundVC = [[RYGApplyRefundViewController alloc]init];
+    applyRefundVC.order_no = order_no;
+    [self.navigationController pushViewController:applyRefundVC animated:YES];
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

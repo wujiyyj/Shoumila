@@ -1,0 +1,35 @@
+//
+//  RYGBaseParam.m
+//  shoumila
+//
+//  Created by 贾磊 on 15/7/23.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGBaseParam.h"
+#import "APService.h"
+
+@implementation RYGBaseParam
+- (id)init
+{
+    if (self = [super init]) {
+        self.token = @"3b64xOuIYxkFIv86EDjbvQTifLNBx7VZVxpS0f7Aw5sRvHmbWpaC-4VMznXqNMZcCsust7yDqNaqxpp_H7epbnS8-63w";
+        self.device = @"ios";
+
+#ifdef DEBUG
+        self.client_id = @"11111";
+        self.token = Token;
+#else
+        self.client_id = [APService registrationID];
+        self.token = [RYGUtility getUserInfo].token;
+#endif
+    }
+    return self;
+}
+
++ (instancetype)param
+{
+    return [[self alloc] init];
+}
+
+@end

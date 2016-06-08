@@ -1,0 +1,28 @@
+//
+//  RYGPersonalUserModel.h
+//  shoumila
+//
+//  Created by yinyujie on 15/8/5.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface RYGPersonalUserModel : NSObject<NSCoding>
+
+@property(nonatomic,copy) NSString *userid;
+@property(nonatomic,copy) NSString *user_logo; //用户头像
+@property(nonatomic,copy) NSString *user_name;
+@property(nonatomic,copy) NSString *can_edit;   //是否可以订阅
+@property(nonatomic,copy) NSString *score;
+@property(nonatomic,copy) NSString *praise_num;
+@property(nonatomic,copy) NSString *user_praise_num;
+@property(nonatomic,copy) NSString *funs_num;
+@property(nonatomic,copy) NSString *favorite_num;
+@property(nonatomic,copy) NSString *attention_num;
+@property(nonatomic,copy) NSString *grade;
+@property(nonatomic,copy) NSString *money;
+@property(nonatomic,copy) NSString *is_praise;
+@property(nonatomic,copy) NSString *is_attention;
+
+@end

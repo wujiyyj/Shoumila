@@ -1,0 +1,327 @@
+//
+//  RYGSourceTableViewCell.m
+//  shoumila
+//
+//  Created by 贾磊 on 15/8/29.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGSourceTableViewCell.h"
+#import "RYGPublishViewController.h"
+#import "RYGNavigationController.h"
+
+@interface RYGSourceTableViewCell ()
+
+@end
+
+@implementation RYGSourceTableViewCell
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        UIView *line1 = [[UIView alloc]initWithFrame:CGRectMake(45, 10, 1, 48)];
+        line1.backgroundColor = ColorLine;
+        [self addSubview:line1];
+        UIView *line2 = [[UIView alloc]initWithFrame:CGRectMake(0, 1, SCREEN_WIDTH, 1)];
+        line2.backgroundColor = ColorLine;
+        [self addSubview:line2];
+        
+        _l1 = [[UILabel alloc]initWithFrame:CGRectMake(0, 8, 50, 17)];
+        _l1.font = [UIFont systemFontOfSize:10];
+        _l1.textColor = ColorRankMenuBackground;
+        [self addSubview:_l1];
+        
+        _l2 = [[UILabel alloc]initWithFrame:CGRectMake(0, 25, 50, 17)];
+        _l2.font = [UIFont systemFontOfSize:10];
+        _l2.textColor = ColorSecondTitle;
+        [self addSubview:_l2];
+        
+        _l3 = [[UILabel alloc]initWithFrame:CGRectMake(0, 41, 50, 17)];
+        
+        _l3.font = [UIFont systemFontOfSize:10];
+        _l3.textColor = ColorSecondTitle;
+//        [_l3 sizeToFit];
+        [self addSubview:_l3];
+        
+        _ht = [[UILabel alloc]initWithFrame:CGRectMake(51*SCREEN_SCALE, 8, 110, 17)];
+        
+        _ht.font = [UIFont systemFontOfSize:10];
+        _ht.textColor = ColorName;
+//        [_ht sizeToFit];
+        [self addSubview:_ht];
+        
+        _vt = [[UILabel alloc]initWithFrame:CGRectMake(51*SCREEN_SCALE, 25, 110, 17)];
+        
+        _vt.font = [UIFont systemFontOfSize:10];
+        _vt.textColor = ColorName;
+//        [_vt sizeToFit];
+        [self addSubview:_vt];
+        
+        UILabel *he = [[UILabel alloc]initWithFrame:CGRectMake(51*SCREEN_SCALE, 41, 30, 17)];
+        he.text = @"和局";
+        he.font = [UIFont systemFontOfSize:10];
+        he.textColor = ColorName;
+        [self addSubview:he];
+        
+        _hvo = [[UILabel alloc]initWithFrame:CGRectMake(150*SCREEN_SCALE, 8, 30, 17)];
+        
+        _hvo.font = [UIFont systemFontOfSize:10];
+        _hvo.textColor = ColorName;
+//        [_hvo sizeToFit];
+        [self addSubview:_hvo];
+        
+        _vvo = [[UILabel alloc]initWithFrame:CGRectMake(150*SCREEN_SCALE, 25, 30, 17)];
+        
+        _vvo.font = [UIFont systemFontOfSize:10];
+        _vvo.textColor = ColorName;
+//        [_vvo sizeToFit];
+        [self addSubview:_vvo];
+        
+        _dro = [[UILabel alloc]initWithFrame:CGRectMake(150*SCREEN_SCALE, 41, 30, 17)];
+        _dro.font = [UIFont systemFontOfSize:10];
+        _dro.textColor = ColorName;
+//        [_dro sizeToFit];
+        [self addSubview:_dro];
+        
+        _hr = [[UILabel alloc]initWithFrame:CGRectMake(190*SCREEN_SCALE, 11, 33, 17)];
+        _hr.font = [UIFont systemFontOfSize:10];
+        _hr.textColor = ColorRankMedal;
+//        [_hr sizeToFit];
+        [self addSubview:_hr];
+        
+        _vr = [[UILabel alloc]initWithFrame:CGRectMake(190*SCREEN_SCALE, 28, 33, 17)];
+        _vr.font = [UIFont systemFontOfSize:10];
+        _vr.textColor = ColorRankMedal;
+//        [_vr sizeToFit];
+        [self addSubview:_vr];
+        
+        _hro = [[UILabel alloc]initWithFrame:CGRectMake(220*SCREEN_SCALE, 8, 30, 17)];
+        _hro.font = [UIFont systemFontOfSize:10];
+        _hro.textColor = ColorName;
+//        [_hro sizeToFit];
+        [self addSubview:_hro];
+        
+        _vro = [[UILabel alloc]initWithFrame:CGRectMake(220*SCREEN_SCALE, 25, 30, 17)];
+        
+        _vro.font = [UIFont systemFontOfSize:10];
+        _vro.textColor = ColorName;
+//        [_vro sizeToFit];
+        [self addSubview:_vro];
+        
+        _dx = [[UILabel alloc]initWithFrame:CGRectMake(250*SCREEN_SCALE, 11, 30, 17)];
+        
+        _dx.font = [UIFont systemFontOfSize:10];
+        _dx.textColor = ColorRankMedal;
+//        [_dx sizeToFit];
+        [self addSubview:_dx];
+        
+        _dxh = [[UILabel alloc]initWithFrame:CGRectMake(285*SCREEN_SCALE, 8, 30, 17)];
+        
+        _dxh.font = [UIFont systemFontOfSize:10];
+        _dxh.textColor = ColorName;
+//        [_dxh sizeToFit];
+        [self addSubview:_dxh];
+        
+        _dxv = [[UILabel alloc]initWithFrame:CGRectMake(285*SCREEN_SCALE, 25, 30, 17)];
+        
+        _dxv.font = [UIFont systemFontOfSize:10];
+        _dxv.textColor = ColorName;
+//        [_dxv sizeToFit];
+        [self addSubview:_dxv];
+
+    }
+    return self;
+}
+
+-(void)setData:(RYGScoreGQEntity *)data{
+    _data = data;
+    NSString *l1text;
+    NSString *l2text;
+    NSString *l3text;
+    if (data.hs&&data.vs) {
+        l1text = [NSString stringWithFormat:@"%@-%@",data.hs,data.vs];
+        l2text = [NSString stringWithFormat:@"%@",data.hc];
+        l3text = [NSString stringWithFormat:@"%@",data.t];
+    }else{
+        l1text = [NSString stringWithFormat:@"LIVE!"];
+        l2text = [NSString stringWithFormat:@"%@",data.date];
+        l3text = [NSString stringWithFormat:@"%@",data.stime];
+    }
+    if ([data.hc isEqualToString:@"MT"]) {
+        l2text = @"";
+        l3text = @"";
+    }
+    _l1.text = l1text;
+    _l2.text = l2text;
+    _l3.text = l3text;
+    _l1.textAlignment = NSTextAlignmentCenter;
+    _l2.textAlignment = NSTextAlignmentCenter;
+    _l3.textAlignment = NSTextAlignmentCenter;
+    UITapGestureRecognizer *regconizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    _hvo.text = data.hvo;
+    _hvo.tag = 100;
+    if (![_data.hvo isEqualToString:@""]&&_data.hvo){
+        [_hvo addGestureRecognizer:regconizer];
+        _hvo.userInteractionEnabled = YES;
+    }
+    _vvo.text = data.vvo;
+    _vvo.tag = 101;
+    if (![_data.vvo isEqualToString:@""]&&_data.vvo)
+    _vvo.userInteractionEnabled = YES;
+    UITapGestureRecognizer *regconizer101 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_vvo addGestureRecognizer:regconizer101];
+
+    _ht.text = data.ht;
+    _vt.text = data.vt;
+    _dro.text = data.dro;
+    _dro.tag = 102;
+    if (![_data.dro isEqualToString:@""]&&_data.dro)
+    _dro.userInteractionEnabled = YES;
+    UITapGestureRecognizer *regconizer102 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_dro addGestureRecognizer:regconizer102];
+
+    _hr.text = data.hr;
+    [_hr sizeToFit];
+    _vr.text = data.vr;
+    [_vr sizeToFit];
+    _hro.text = data.hro;
+    _hro.tag = 103;
+    if (![_data.hro isEqualToString:@""]&&_data.hro)
+    _hro.userInteractionEnabled = YES;
+    UITapGestureRecognizer *regconizer103 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_hro addGestureRecognizer:regconizer103];
+
+    _vro.text = data.vro;
+    _vro.tag = 104;
+    if (![_data.vro isEqualToString:@""]&&_data.vro)
+    _vro.userInteractionEnabled = YES;
+    UITapGestureRecognizer *regconizer104 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_vro addGestureRecognizer:regconizer104];
+
+    _dx.text = data.dx;
+    [_dx sizeToFit];
+    _dxh.text = data.dxh;
+    _dxh.tag = 105;
+    if (![_data.dxh isEqualToString:@""]&&_data.dxh)
+    _dxh.userInteractionEnabled = YES;
+    UITapGestureRecognizer *regconizer105 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_dxh addGestureRecognizer:regconizer105];
+    _dxv.text = data.dxv;
+    _dxv.tag = 106;
+    if (![_data.dxv isEqualToString:@""]&&_data.dxv)
+    _dxv.userInteractionEnabled = YES;
+    UITapGestureRecognizer *regconizer106 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(selectLabel:)];
+    [_dxv addGestureRecognizer:regconizer106];
+    
+    [self changeColor];
+}
+
+- (void)changeColor{
+    RYGColorChange  *change = _data.change;
+    if (change.hvo) {
+        _hvo.textColor =[UIColor colorWithHexadecimal:change.hvo];        
+    }
+    if (change.vvo) {
+        _vvo.textColor =[UIColor colorWithHexadecimal:change.vvo];
+    }
+    if (change.dro) {
+        _dro.textColor =[UIColor colorWithHexadecimal:change.dro];
+    }
+    if (change.hr) {
+        _hr.textColor =[UIColor colorWithHexadecimal:change.hr];
+    }
+    if (change.vr) {
+        _vr.textColor =[UIColor colorWithHexadecimal:change.vr];
+    }
+    if (change.hro) {
+        _hro.textColor =[UIColor colorWithHexadecimal:change.hro];
+    }
+    if (change.vro) {
+        _vro.textColor =[UIColor colorWithHexadecimal:change.vro];
+    }
+    if (change.dx) {
+        _dx.textColor =[UIColor colorWithHexadecimal:change.dx];
+    }
+    if (change.dxh) {
+        _dxh.textColor =[UIColor colorWithHexadecimal:change.dxh];
+    }
+    if (change.dxv) {
+        _dxv.textColor =[UIColor colorWithHexadecimal:change.dxv];
+    }
+
+}
+
+-(void)selectLabel1:(UITapGestureRecognizer *)regconizer{
+    NSLog(@"111");
+}
+-(void)selectLabel:(UITapGestureRecognizer *)regconizer{
+    RYGScoreParam *param = [[RYGScoreParam alloc]init];
+    param.matchid = _data.mid;
+    param.ht = _data.ht;
+    param.vt = _data.vt;
+    if (_data.hs) {
+        param.type = @"2";
+        param.hs = _data.hs;
+        param.vs = _data.vs;
+    }else{
+        param.type = @"1";
+    }
+    switch (regconizer.view.tag) {
+        case 100:
+            param.rules = @"1";
+            param.forecasts = @"1";
+            param.odds = _data.hvo;
+            break;
+        case 101:
+            param.rules = @"1";
+            param.forecasts = @"2";
+            param.odds = _data.vvo;
+            break;
+        case 102:
+            param.rules = @"1";
+            param.forecasts = @"3";
+            param.odds = _data.dro;
+            break;
+        case 103:
+            param.rules = @"2";
+            param.forecasts = @"1";
+            param.handicap = _data.hr;
+            param.odds = _data.hro;
+            break;
+        case 104:
+            param.rules = @"2";
+            param.forecasts = @"2";
+            param.handicap = _data.hr;
+            param.odds = _data.vro;
+            break;
+        case 105:
+            param.rules = @"3";
+            param.forecasts = @"1";
+            param.handicap = _data.dx;
+            param.odds = _data.dxh;
+            break;
+        case 106:
+            param.rules = @"3";
+            param.forecasts = @"2";
+            param.handicap = _data.dx;
+            param.odds = _data.dxv;
+            break;
+            
+        default:
+            break;
+    }
+    if (_selectScoreBlock) {
+        _selectScoreBlock(param);
+        [[NSNotificationCenter defaultCenter]postNotificationName:kPublishVCCancelNotification object:nil];
+    }else if([RYGUtility getUserInfo]){
+        RYGPublishViewController *publishController = [[RYGPublishViewController alloc]init];
+        publishController.scoreParam = param;
+        RYGNavigationController *nav = [[RYGNavigationController alloc]initWithRootViewController:publishController];
+        [[RYGUtility getCurrentVC]presentViewController:nav animated:YES completion:^{
+            [publishController scoreCallBack];
+        }];
+    }
+}
+
+@end

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>167DB9E7-7879-474B-AE1A-31D901BF1533</string>
+	<key>IDESourceControlProjectName</key>
+	<string>shoumila</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>52c7c94f-cc11-4a0b-a316-c8e06e8074b6++1130</key>
+		<string>svn://www.svn999.com/jialei.shoumila1/shoumila</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>shoumila.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>52c7c94f-cc11-4a0b-a316-c8e06e8074b6++1130</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>52c7c94f-cc11-4a0b-a316-c8e06e8074b6++1130</key>
+		<string>svn://www.svn999.com/jialei.shoumila1</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>svn://www.svn999.com/jialei.shoumila1/shoumila/shoumila.xcodeproj</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>52c7c94f-cc11-4a0b-a316-c8e06e8074b6++1130</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>52c7c94f-cc11-4a0b-a316-c8e06e8074b6++1130</string>
+			<key>IDESourceControlWCCName</key>
+			<string>shoumila</string>
+		</dict>
+	</array>
+</dict>
+</plist>

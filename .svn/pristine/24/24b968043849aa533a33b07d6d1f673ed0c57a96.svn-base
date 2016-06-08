@@ -1,0 +1,82 @@
+//
+//  RYGScoreTableViewCell.m
+//  shoumila
+//
+//  Created by 贾磊 on 15/8/26.
+//  Copyright (c) 2015年 如意谷. All rights reserved.
+//
+
+#import "RYGScoreTableViewCell.h"
+#import "RYGSourceTableViewCell.h"
+
+static NSString *scoreCell = @"scoreCell";
+
+@interface RYGScoreTableViewCell ()<UITableViewDataSource,UITableViewDelegate>
+@property(nonatomic,strong) UILabel *leagueLable;
+@property(nonatomic,strong) UITableView *cellTableView;
+@end
+
+@implementation RYGScoreTableViewCell
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        _leagueLable = [[UILabel alloc]initWithFrame:CGRectMake(10, 0, SCREEN_WIDTH, 23)];
+        _leagueLable.font = [UIFont systemFontOfSize:12];
+        [self addSubview:_leagueLable];
+        _cellTableView = [[UITableView alloc]init];
+        _cellTableView.dataSource = self;
+        _cellTableView.delegate = self;
+        _cellTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _cellTableView.scrollEnabled = NO;
+        [self addSubview:_cellTableView];
+
+    }
+    return self;
+}
+
+
+-(void)setScoureGQModel:(RYGScoreGQModel *)scoureGQModel{
+    _scoureGQModel = scoureGQModel;
+    _leagueLable.text = scoureGQModel.league_name;
+    _cellTableView.frame = CGRectMake(0, 23, SCREEN_WIDTH, 68*scoureGQModel.match.count);
+    [_cellTableView reloadData];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 68;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return  _scoureGQModel.match.count;
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    RYGSourceTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:scoreCell];
+    if (cell==nil) {
+        cell = [[RYGSourceTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:scoreCell];
+    }
+    
+    cell.data = _scoureGQModel.match[indexPath.row];
+//    cell.selectScoreBlock = ^(RYGScoreParam *param){
+//        if (_scoreCleckBlock) {
+//            _scoreCleckBlock(param);
+//        }
+//    };
+    cell.selectScoreBlock = _scoreCleckBlock;
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    return cell;
+}
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"ddd");
+}
+
+-(void)layoutSubviews{
+    self.width = SCREEN_WIDTH;
+}
+@end

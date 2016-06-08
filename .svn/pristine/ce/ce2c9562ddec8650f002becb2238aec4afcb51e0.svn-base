@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>name</key>
+		<string>我的动态</string>
+		<key>class</key>
+		<string>RYGDynamicViewController</string>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>我的关注</string>
+		<key>class</key>
+		<string>RYGFeedAttentionViewController</string>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>我的套餐</string>
+		<key>class</key>
+		<string>RYGPackageViewController</string>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>我的收藏</string>
+		<key>class</key>
+		<string>RYGCollectionViewController</string>
+	</dict>
+</array>
+</plist>
